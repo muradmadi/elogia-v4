@@ -1,0 +1,46 @@
+"""Application configuration using Pydantic BaseSettings."""
+from typing import List
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """Application settings with environment variable support."""
+    
+    # Application settings
+    app_name: str = "Agentic SDR API"
+    app_env: str = "development"
+    app_debug: bool = True
+    app_host: str = "0.0.0.0"
+    app_port: int = 8000
+    
+    # Database settings
+    database_url: str = "postgresql+asyncpg://user:password@localhost:5432/elogia_db"
+    
+    # Security
+    secret_key: str = "your-secret-key-here-change-in-production"
+    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    
+    # Logging
+    log_level: str = "INFO"
+    
+    # Alembic
+    alembic_db_url: str = "postgresql+asyncpg://user:password@localhost:5432/elogia_db"
+    
+    # Clay Webhook Integration
+    clay_webhook_url: str = "https://api.clay.com/v3/sources/webhook/pull-in-data-from-a-webhook-5ed7a29a-3a2c-4d01-ae22-f877fc4d5197"
+    clay_webhook_auth_token: str = "b0684b655aeef49899f2"
+    public_base_url: str = "http://localhost:8000"
+    
+    # AI API Keys
+    anthropic_api_key: str = ""
+    
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+
+# Global settings instance
+settings = Settings()
