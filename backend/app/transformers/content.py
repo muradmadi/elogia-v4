@@ -20,7 +20,7 @@ def transform_content_snack(content_snack: ContentSnack) -> ContentSnackResponse
         asset_id=content_snack.asset_id,
         content_type=content_snack.content_type,
         content_text=content_snack.content_text,
-        metadata=content_snack.metadata,
+        content_metadata=content_snack.content_metadata,
         created_at=content_snack.created_at,
         updated_at=content_snack.updated_at,
     )

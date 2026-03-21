@@ -15,7 +15,7 @@ class ContentSnackResponse(BaseSchema):
     asset_id: UUID = Field(..., description="Parent asset identifier")
     content_type: str = Field(..., description="Content type (linkedin_post or email_pill)")
     content_text: str = Field(..., description="The actual content text")
-    metadata: Optional[dict] = Field(None, description="Additional metadata (hashtags, target audience, etc.)")
+    content_metadata: Optional[dict] = Field(None, description="Additional metadata (hashtags, target audience, etc.)")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
 

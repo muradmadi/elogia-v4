@@ -15,7 +15,8 @@ class ClayWebhookService:
         """Initialize the Clay webhook service."""
         self.webhook_url = settings.clay_webhook_url
         self.auth_token = settings.clay_webhook_auth_token
-        self.public_base_url = settings.public_base_url
+        # Strip any trailing whitespace from public_base_url to prevent invalid URLs
+        self.public_base_url = settings.public_base_url.strip()
     
     async def trigger_enrichment(
         self,

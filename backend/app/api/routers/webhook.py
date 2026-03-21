@@ -10,7 +10,7 @@ from app.core.status import ResponseStatus
 from app.models.enrichment import EnrichmentJob
 from app.schemas.webhook import ClayWebhookPayload
 from app.services.enrichment_service import EnrichmentService
-from backend.app.services.clay_service import ClayWebhookService
+from app.services.clay_service import ClayWebhookService
 
 # Configure logger
 logger = logging.getLogger(__name__)
