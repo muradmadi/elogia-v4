@@ -98,3 +98,6 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+
+# Ignore PDF files in storage folder but keep the folder
+backend/storage/pdfs/*
