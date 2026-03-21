@@ -1,12 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
+"""Pydantic schemas for email sequence generation data."""
+from pydantic import Field
 from typing import List, Optional
 
-class BaseSchema(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True,
-        extra="ignore",
-    )
+from .base import BaseSchema
 
 class TouchView(BaseSchema):
     objective: str = Field(description="Goal of this outreach touch (e.g., Observation/Relevance hook, Value delivery)")

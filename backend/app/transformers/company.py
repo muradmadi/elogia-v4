@@ -1,3 +1,4 @@
+"""Transformer for company data from enrichment payloads."""
 from typing import Dict, Any
 
 def transform_company(payload: Dict[str, Any]) -> Dict[str, Any]:

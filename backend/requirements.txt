@@ -29,3 +29,6 @@ uuid7>=0.1.0,<0.3.0
 
 # AI Model
 anthropic>=0.86.0
+
+# Required for FastAPI to handle file uploads and form data (e.g., PDF uploads)
+python-multipart>=0.0.9

@@ -1,1 +1,1 @@
-"Agentic SDR backend application package."
+"""Agentic SDR backend application package."""

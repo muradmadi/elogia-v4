@@ -1,13 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
+"""Pydantic schemas for enriched lead profile data."""
+from pydantic import Field
 from typing import List, Optional
 
-# --- Base configuration for all models ---
-class BaseSchema(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True,   # Allows ORM -> Pydantic conversion
-        populate_by_name=True,
-        extra="ignore",  # Allows alias mapping
-    )
+from .base import BaseSchema
 
 # --- 1. Nested Models for Person Data ---
 class ExperienceView(BaseSchema):
@@ -51,9 +46,9 @@ class TopImageItemView(BaseSchema):
 
 class GalleryFlowView(BaseSchema):
     story_arc: Optional[str] = Field(None, description="Narrative progression of the image gallery")
+    progression: Optional[str] = Field(None, description="Progression of the image gallery")
     coverage_gaps: List[str] = Field(default_factory=list, description="Missing elements in the visual story")
-    mobile_score: Optional[int] = Field(None, description="Mobile experience rating (0-10)")
-    mobile_issues: List[str] = Field(default_factory=list, description="Specific mobile usability problems")
+    mobile_experience: Optional[str] = Field(None, description="Mobile experience analysis")
 
 class CompetitiveBenchmarkView(BaseSchema):
     relative_position: str = Field(description="Position vs competitors: 'above', 'below', or 'on par'")
@@ -130,10 +125,17 @@ class ChannelTimingView(BaseSchema):
     avoid_time: str = Field(description="Times to avoid")
     reasoning: str = Field(description="Why these timings are recommended")
 
+
+class ChannelFormatView(BaseSchema):
+    style: Optional[str] = Field(None, description="Style of the content format")
+    length: Optional[str] = Field(None, description="Length of the content format")
+    reasoning: Optional[str] = Field(None, description="Reasoning behind the format choice")
+
+
 class ChannelStrategyView(BaseSchema):
     primary_channel: str = Field(description="Main channel for outreach (e.g., 'Email')")
     secondary_channel: str = Field(description="Fallback channel (e.g., 'LinkedIn')")
-    format: dict = Field(description="Format details (style, length, reasoning)")
+    format: Optional[ChannelFormatView] = Field(None, description="Format details (style, length, reasoning)")
     timing: ChannelTimingView = Field(description="Timing recommendations")
 
 class RiskMitigationView(BaseSchema):

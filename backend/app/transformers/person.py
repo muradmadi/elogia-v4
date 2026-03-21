@@ -1,3 +1,4 @@
+"""Transformer for person data from enrichment payloads."""
 from typing import Dict, Any
 from .base import parse_date, slice_list
 

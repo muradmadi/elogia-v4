@@ -6,10 +6,10 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.models.sequence import CampaignSequence
+from app.core.status import ResponseStatus
 from app.schemas.sequence import ClaudeOutreachView
-from app.services.enrichment_service import get_sequence_data
-from app.services.generation_service import generate_sequence
+from app.services.sequence_service import SequenceService
+from app.services.generation_service import GenerationService
 
 logger = logging.getLogger(__name__)
 
@@ -51,47 +51,19 @@ async def generate_sequence_endpoint(
             detail=f"Invalid job ID format: {job_id}",
         )
     
-    # Check if the job exists in the database
-    from sqlalchemy import select
-    from app.models.enrichment import EnrichmentJob
+    # Initialize service
+    service = SequenceService(db)
     
-    result = await db.execute(
-        select(EnrichmentJob).where(EnrichmentJob.job_id == uuid_job_id)
-    )
-    job = result.scalar_one_or_none()
-    
-    if not job:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Enrichment job with ID {job_id} not found",
-        )
-    
-    # Check if a sequence already exists for this job
-    result = await db.execute(
-        select(CampaignSequence).where(
-            CampaignSequence.enrichment_job_id == uuid_job_id
-        )
-    )
-    existing_sequence = result.scalar_one_or_none()
-    
-    if existing_sequence:
-        sequence_id = existing_sequence.id
-    else:
-        # Create a new sequence record to get the ID
-        new_sequence = CampaignSequence(
-            enrichment_job_id=uuid_job_id,
-            status="generating",
-        )
-        db.add(new_sequence)
-        await db.commit()
-        await db.refresh(new_sequence)
-        sequence_id = new_sequence.id
+    # Get or create sequence using service
+    sequence = await service.get_or_create_sequence(uuid_job_id)
     
     # Add the generation task to background tasks
     # The task will run asynchronously without blocking the HTTP response
+    # Note: GenerationService.generate_sequence creates its own DB session internally
+    # to avoid using the request-scoped session that gets closed after response
+    generation_service = GenerationService()
     background_tasks.add_task(
-        generate_sequence,
-        db_session=db,
+        generation_service.generate_sequence,
         job_id=job_id,
     )
     
@@ -100,8 +72,8 @@ async def generate_sequence_endpoint(
     # Return immediately with 202 Accepted
     return {
         "job_id": job_id,
-        "sequence_id": str(sequence_id),
-        "status": "accepted",
+        "sequence_id": str(sequence.id),
+        "status": ResponseStatus.ACCEPTED,
         "message": "Sequence generation started in background",
     }
 
@@ -133,7 +105,11 @@ async def get_sequence_endpoint(
         HTTPException: If job or sequence is not found, or data not yet generated.
     """
     try:
-        return await get_sequence_data(db, job_id)
+        # Initialize service
+        service = SequenceService(db)
+        
+        # Get sequence data using service
+        return await service.get_sequence_data(job_id)
     except HTTPException:
         raise
     except Exception as e:

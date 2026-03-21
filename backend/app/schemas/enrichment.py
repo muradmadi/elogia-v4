@@ -3,16 +3,19 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from app.core.status import EnrichmentJobStatus
+from app.schemas.base import BaseSchema
 
 
 # Base schema with common fields
-class EnrichmentJobBase(BaseModel):
+class EnrichmentJobBase(BaseSchema):
     """Base schema for EnrichmentJob."""
     
     job_id: UUID = Field(..., description="Unique identifier for the job")
     email: str = Field(..., min_length=1, max_length=255, description="Email address to enrich")
-    status: str = Field("pending", description="Current status of the job")
+    status: EnrichmentJobStatus = Field(EnrichmentJobStatus.PENDING, description="Current status of the job")
     
     # JSONB payload fields
     payload_1: Optional[dict] = Field(None, description="First payload data")
@@ -31,10 +34,10 @@ class EnrichmentJobCreate(EnrichmentJobBase):
 
 
 # Schema for updating an existing job
-class EnrichmentJobUpdate(BaseModel):
+class EnrichmentJobUpdate(BaseSchema):
     """Schema for updating an EnrichmentJob."""
     
-    status: Optional[str] = Field(None, description="Updated status")
+    status: Optional[EnrichmentJobStatus] = Field(None, description="Updated status")
     payload_1: Optional[dict] = Field(None, description="Updated first payload")
     payload_2: Optional[dict] = Field(None, description="Updated second payload")
     payload_3: Optional[dict] = Field(None, description="Updated third payload")
@@ -49,18 +52,12 @@ class EnrichmentJobUpdate(BaseModel):
 class EnrichmentJobResponse(EnrichmentJobBase):
     """Schema for returning EnrichmentJob data."""
     
-    id: UUID = Field(..., description="Unique identifier")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
-    
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True,
-    )
 
 
 # Schema for listing jobs with pagination
-class EnrichmentJobListResponse(BaseModel):
+class EnrichmentJobListResponse(BaseSchema):
     """Schema for paginated list of EnrichmentJobs."""
     
     items: list[EnrichmentJobResponse] = Field(..., description="List of jobs")
@@ -68,32 +65,24 @@ class EnrichmentJobListResponse(BaseModel):
     page: int = Field(..., description="Current page number")
     size: int = Field(..., description="Number of items per page")
     pages: int = Field(..., description="Total number of pages")
-    
-    model_config = ConfigDict(from_attributes=True)
 
 
 # Schema for job summary (frontend dropdown)
-class JobSummary(BaseModel):
+class JobSummary(BaseSchema):
     """Schema for job summary in frontend dropdown."""
     
     job_id: UUID = Field(..., description="Unique identifier for the job")
     email: str = Field(..., min_length=1, max_length=255, description="Email address to enrich")
-    status: str = Field(..., description="Current status of the job")
-    
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True,
-    )
+    status: EnrichmentJobStatus = Field(..., description="Current status of the job")
 
 
 # Schema for consolidated payload (full job with all JSONB payloads)
-class ConsolidatedPayload(BaseModel):
+class ConsolidatedPayload(BaseSchema):
     """Schema for consolidated payload with all JSONB data."""
     
-    id: UUID = Field(..., description="Unique identifier")
     job_id: UUID = Field(..., description="Unique identifier for the job")
     email: str = Field(..., min_length=1, max_length=255, description="Email address to enrich")
-    status: str = Field(..., description="Current status of the job")
+    status: EnrichmentJobStatus = Field(..., description="Current status of the job")
     
     # JSONB payload fields
     payload_1: Optional[dict] = Field(None, description="First payload data")
@@ -106,8 +95,3 @@ class ConsolidatedPayload(BaseModel):
     # Timestamps
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
-    
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True,
-    )

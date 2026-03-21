@@ -1,5 +1,5 @@
 """EnrichmentJob model for storing webhook data in PostgreSQL JSONB columns."""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID, uuid4
 
@@ -7,7 +7,8 @@ from sqlalchemy import String, DateTime, func, UUID as SQLAlchemyUUID
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.core.database import Base
+from app.core.status import EnrichmentJobStatus
 
 
 class EnrichmentJob(Base):
@@ -15,19 +16,11 @@ class EnrichmentJob(Base):
     
     __tablename__ = "enrichment_jobs"
     
-    # Primary key - UUID
-    id: Mapped[UUID] = mapped_column(
+    # Primary key - job_id (Clay job identifier)
+    job_id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4,
         server_default=func.uuid_generate_v4(),
-    )
-    
-    # Job identifier
-    job_id: Mapped[UUID] = mapped_column(
-        SQLAlchemyUUID,
-        nullable=False,
-        index=True,
-        unique=True,
     )
     
     # Email being enriched
@@ -38,11 +31,11 @@ class EnrichmentJob(Base):
     )
     
     # Job status
-    status: Mapped[str] = mapped_column(
+    status: Mapped[EnrichmentJobStatus] = mapped_column(
         String(50),
         nullable=False,
-        default="pending",
-        server_default="pending",
+        default=EnrichmentJobStatus.PENDING,
+        server_default=EnrichmentJobStatus.PENDING,
     )
     
     # 6 JSONB payload columns for webhook data
@@ -86,15 +79,15 @@ class EnrichmentJob(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
-        default=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
         server_default=func.now(),
     )
     
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime,
         nullable=True,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
     
     # Relationship to CampaignSequence
@@ -107,4 +100,4 @@ class EnrichmentJob(Base):
     
     def __repr__(self) -> str:
         """String representation of the model."""
-        return f"<EnrichmentJob(id={self.id}, email={self.email}, status={self.status})>"
+        return f"<EnrichmentJob(job_id={self.job_id}, email={self.email}, status={self.status})>"

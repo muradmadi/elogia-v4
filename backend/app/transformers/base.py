@@ -1,3 +1,4 @@
+"""Base transformer utilities for data parsing and slicing."""
 from typing import Any, List, Optional
 from datetime import datetime
 

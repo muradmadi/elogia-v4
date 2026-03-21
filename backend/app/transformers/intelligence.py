@@ -1,11 +1,12 @@
 import logging
+import re
 from typing import Dict, Any, List, Optional
 from .base import slice_list
 
 # Configure logger
 logger = logging.getLogger(__name__)
 
-def transform_public_statements(statements: List[Dict]) -> List[Dict]:
+def transform_public_statements(statements: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return [
         {
             "date": stmt.get("date"),
@@ -28,7 +29,6 @@ def transform_product_intelligence(product_payload: Dict[str, Any]) -> List[Dict
     reasoning = product_payload.get("reasoning", "")
     if reasoning and "for" in reasoning:
         # Try to extract product name from phrases like "data for Almirón Profutura 33"
-        import re
         # Look for "for [Product Name]" pattern, capturing until next period or comma
         # Using .+? to match any characters (including Unicode) non-greedily
         match = re.search(r'for\s+(.+?)(?:\.|,|$)', reasoning)
@@ -124,7 +124,7 @@ def transform_product_intelligence(product_payload: Dict[str, Any]) -> List[Dict
         "prioritized_recommendations": prioritized_recommendations,
     }]
 
-def transform_pain_points(pain: Dict[str, Any]) -> Optional[Dict]:
+def transform_pain_points(pain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if not pain:
         logger.warning("Empty pain payload received")
         return None
@@ -174,7 +174,7 @@ def transform_pain_points(pain: Dict[str, Any]) -> Optional[Dict]:
         "categories": categories,
     }
 
-def transform_outreach_strategy(outreach: Dict[str, Any]) -> Optional[Dict]:
+def transform_outreach_strategy(outreach: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if not outreach:
         logger.warning("Empty outreach payload received")
         return None

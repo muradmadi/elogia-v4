@@ -1,1 +1,1 @@
-"Core configuration and database modules."
+"""Core configuration and database modules."""

@@ -29,7 +29,15 @@ class Settings(BaseSettings):
     # Clay Webhook Integration
     clay_webhook_url: str = "https://api.clay.com/v3/sources/webhook/pull-in-data-from-a-webhook-5ed7a29a-3a2c-4d01-ae22-f877fc4d5197"
     clay_webhook_auth_token: str = "b0684b655aeef49899f2"
+    
+    # n8n Webhook Integration
+    n8n_shredder_webhook_url: str = "http://localhost:5678/webhook/content-shredder"
+    
+    # Public Base URL (used for callback URLs in both Clay and n8n webhooks)
     public_base_url: str = "http://localhost:8000"
+    
+    # Storage directory for uploaded PDFs
+    storage_dir: str = "storage/pdfs"
     
     # AI API Keys
     anthropic_api_key: str = ""

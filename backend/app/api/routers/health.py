@@ -1,5 +1,6 @@
 """Health check router for API status monitoring."""
 from fastapi import APIRouter, Depends
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -36,7 +37,7 @@ async def readiness_check(db: AsyncSession = Depends(get_db)) -> dict:
     """
     try:
         # Test database connection
-        await db.execute("SELECT 1")
+        await db.execute(text("SELECT 1"))
         return {
             "status": "ready",
             "database": "connected",

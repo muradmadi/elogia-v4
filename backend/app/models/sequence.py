@@ -1,5 +1,5 @@
 """CampaignSequence model for storing email sequence data."""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID, uuid4
 
@@ -7,7 +7,8 @@ from sqlalchemy import String, DateTime, func, ForeignKey, UUID as SQLAlchemyUUI
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.core.database import Base
+from app.core.status import CampaignSequenceStatus
 from app.models.enrichment import EnrichmentJob
 
 
@@ -53,26 +54,26 @@ class CampaignSequence(Base):
     )
     
     # Sequence generation status
-    status: Mapped[str] = mapped_column(
+    status: Mapped[CampaignSequenceStatus] = mapped_column(
         String(50),
         nullable=False,
-        default="pending",
-        server_default="pending",
+        default=CampaignSequenceStatus.PENDING,
+        server_default=CampaignSequenceStatus.PENDING,
     )
     
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
-        default=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
         server_default=func.now(),
     )
     
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime,
         nullable=True,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
     
     def __repr__(self) -> str:

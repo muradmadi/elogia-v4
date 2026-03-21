@@ -19,10 +19,9 @@ ClayPayloadType = Literal[
 class ClayWebhookPayload(BaseModel):
     """Incoming Clay webhook payload schema."""
     
-    job_id: str = Field(
+    job_id: UUID = Field(
         ...,
         description="Job identifier for the enrichment job",
-        min_length=1,
     )
     
     email: str = Field(
