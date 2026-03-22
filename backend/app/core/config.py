@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     
     # Security
     secret_key: str = "your-secret-key-here-change-in-production"
-    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:5173", "https://elogia.muradmadi.com", "https://api.muradmadi.com"]
     
     # Logging
     log_level: str = "INFO"
