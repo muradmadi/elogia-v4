@@ -4,18 +4,14 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy package manifest files
+# Copy package manifest files first for layer caching
 COPY package*.json ./
 
 # Clean install dependencies
 RUN npm ci
 
-# Copy entire source code including src/pages directory
-COPY src ./src
-COPY astro.config.mjs .
-COPY tsconfig.json .
-COPY components.json .
-COPY public ./public
+# Copy entire source code (everything in frontend directory)
+COPY . .
 
 # Accept PUBLIC_API_URL as build argument
 # This allows Dokploy to inject the API URL at build time
