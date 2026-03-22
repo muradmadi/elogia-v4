@@ -1,0 +1,78 @@
+---
+import Layout from "../components/layout/Layout.astro";
+import { Navbar } from "../components/layout/Navbar";
+import { InfoModal } from "../components/features/InfoModal";
+import { PdfUploader } from "../components/features/PdfUploader";
+import { ContentResults } from "../components/features/ContentResults";
+---
+
+<Layout title="Content">
+  <Navbar client:load />
+
+  <main class="mx-auto max-w-5xl px-6 py-12 space-y-8">
+    <h1 class="text-4xl font-bold tracking-tight">Content Recycling Machine</h1>
+    <p class="mt-4 text-muted-foreground">From "Long-form" to "Snack" – Transforming dense assets into distribution-ready pieces</p>
+
+    <div class="space-y-8">
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">The Content Recycling Machine (From "Long-form" to "Snack")</h2>
+        <p class="text-foreground/80">Transforming a dense asset into distribution-ready pieces requires a scalable automation loop that operates entirely hands-off. To avoid brittle, linear scripts, I built a robust, asynchronous workflow utilizing a visual node-based orchestrator (like n8n) connected to LlamaParse, Claude, and my FastAPI backend.</p>
+        <p class="text-foreground/80">The core of this architecture is its modularity; the input and output nodes are completely decoupled from the AI processing engine. Where the data comes from and where it goes is fully customizable.</p>
+        <p class="text-foreground/80">For example, it is incredibly easy to connect a shared cloud folder directly to the orchestrator. The moment a user drags and drops a new PDF into that folder, it automatically wakes up the system, sending the file straight to n8n to start the process. Similarly, the outputs are omnichannel: the generated "snacks" can be routed directly into a Notion database for social media review, or injected straight into an email draft box for the next outbound campaign.</p>
+        <p class="text-foreground/80">Here is a detailed breakdown of how this recycling machine operates under the hood, moving from that initial file drop to structured marketing assets.</p>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">1. The Ingestion Trigger (Webhook & Folder Sync)</h2>
+        <p class="text-foreground/80">The workflow is initiated by a frictionless user action—such as dropping a PDF file into a connected frontend interface or a designated cloud folder. This immediately fires a payload to a listening Webhook node. The subsequent HTTP Request node grabs the file buffer and prepares it for processing. There is zero manual data entry required.</p>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">2. The Asynchronous Parsing Engine (LlamaParse & Polling Loop)</h2>
+        <p class="text-foreground/80">Standard PDF parsers often destroy the formatting of dense marketing assets. To extract high-fidelity text, I route the document via a POST request to LlamaParse (api.cloud.llamaindex...).</p>
+        <p class="text-foreground/80">Because complex PDFs take time to process, I implemented a strict asynchronous polling loop to prevent the workflow from timing out.</p>
+        <p class="text-foreground/80">The system hits a Wait node, then checks the Parse Status.</p>
+        <p class="text-foreground/80">An If node evaluates the status. If the parsing is incomplete (False), it routes to a Wait More node and loops back.</p>
+        <p class="text-foreground/80">Once the status is complete (True), it safely advances to Collect Parsed Data, ensuring the system never chokes on large files.</p>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">3. Payload Construction</h2>
+        <p class="text-foreground/80">With the clean, parsed text secured, the system moves to the Payload node. Here, I format a strict JSON object that combines the parsed PDF text with my Master "Recycling" System Prompt. This prepares a clean, precise HTTP request for the LLM.</p>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">4. The AI Extraction (Claude)</h2>
+        <p class="text-foreground/80">The Send to Claude node pushes the payload to the Anthropic API (api.anthropic.com/...). The system prompt governing this node forces Claude to act as an expert Elogia consultant and dictates a rigid JSON output schema. The prompt strictly instructs Claude to "shred" the document and return exactly:</p>
+        <ul class="list-disc pl-6 space-y-2">
+          <li>2 engaging LinkedIn posts, adapted to our tone.</li>
+          <li>2 key insight "pills" ready to be injected into the email sequence from Challenge 2.</li>
+        </ul>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">5. Data Processing & Customizable Delivery</h2>
+        <p class="text-foreground/80">Once Claude returns the generated content, the Process Claude Response node parses the JSON string. Finally, the Sent to FastAPI node pushes this beautifully structured data directly to my backend. From there, the routing logic takes over—automatically dropping the LinkedIn posts into our designated Notion database and injecting the email "pills" directly into our outbound draft box.</p>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">The Scalability Proof</h2>
+        <p class="text-foreground/80">Most importantly, this solution is 100% scalable. Because the orchestration logic, the LlamaParse polling loop, and the Claude JSON schema are entirely agnostic to the subject matter of the PDF, the exact same process applies every time. If we drop a completely different PDF into the system tomorrow, it will execute the exact same Master Prompt and output the exact same required "snacks" without a single line of code needing to be adjusted.</p>
+      </section>
+    </div>
+
+    <div class="mt-12 pt-8 border-t">
+      <div class="mb-8 flex items-center justify-center gap-3">
+        <h2 class="text-2xl font-bold sm:text-3xl">
+          Live Demo
+        </h2>
+        <InfoModal client:load />
+      </div>
+
+      <div class="space-y-8">
+        <PdfUploader client:load />
+        <ContentResults client:visible />
+      </div>
+    </div>
+  </main>
+</Layout>

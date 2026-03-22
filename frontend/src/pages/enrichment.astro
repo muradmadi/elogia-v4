@@ -1,0 +1,131 @@
+---
+import Layout from "../components/layout/Layout.astro";
+import { Navbar } from "../components/layout/Navbar";
+import { EnrichmentForm } from "../components/features/EnrichmentForm";
+import { InfoModal } from "../components/features/InfoModal";
+import { PayloadCardsGrid } from "../components/features/PayloadCardsGrid";
+---
+
+<Layout title="Enrichment">
+  <Navbar client:load />
+
+  <main class="mx-auto max-w-5xl px-6 py-12 space-y-8">
+    <h1 class="text-4xl font-bold tracking-tight">Enrichment Pipeline</h1>
+    <p class="mt-4 text-muted-foreground">Multi-stage intelligence engine for hyper-personalized ABM outreach</p>
+    <p class="mt-2">
+      <a href="https://app.clay.com/shared-table/share_0tc9zh3VRGGKXuHiibn"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="inline-flex items-center gap-2 text-primary hover:text-primary/80 underline underline-offset-4">
+        Clay Template
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </a>
+    </p>
+
+    <div class="space-y-8">
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">Introduction & Architectural Philosophy</h2>
+        <p class="text-foreground/80">Building the "Brain" of an Agentic SDR requires more than just stringing together basic prompts; it requires a modular pipeline built with high architectural cleanliness and a precise operating procedure. While I could build this engine using custom Python scripts to connect APIs, for the sake of speed and robust B2B workflows, I utilize Clay as the foundational orchestration layer.</p>
+        <p class="text-foreground/80">Our target ICP consists of Brand Managers at Fast-Moving Consumer Goods (FMCG) companies in Spain. Starting with a "raw" database consisting only of corporate email addresses, I designed this enrichment strategy as a multi-stage, highly precise data waterfall. My ultimate goal is to generate a comprehensive JSON payload that gives the AI deep contextual awareness of the target's professional profile, pain points, and current Digital Shelf performance before a single word of outreach is drafted.</p>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">1. Foundational Data Ingestion (The Clay Waterfall)</h2>
+        <p class="text-foreground/80">I begin by translating a single data point—the raw corporate email —into a foundational dataset.</p>
+        <ol class="list-decimal pl-6 space-y-2">
+          <li><strong>Identity Resolution:</strong> I ingest the email into Clay, triggering a native enrichment process to locate the prospect's exact LinkedIn URL.</li>
+          <li><strong>Person Enrichment:</strong> I run the LinkedIn URL through Clay's Enrich Person waterfall. Crucially, instead of cluttering the database with dozens of separate columns, I structure the output strictly as a clean JSON object. This preserves the exact operating procedure of the pipeline, allowing subsequent AI agents to surgically extract only the variables they need without parsing through garbage data.</li>
+          <li><strong>Company Enrichment:</strong> I execute a parallel Enrich Company waterfall to pull macro-level data about the FMCG brand. I store this payload as a structured JSON object as well.</li>
+        </ol>
+        <p class="text-foreground/80">At the end of this step, I have a live-updated, highly organized dataset containing the prospect's professional history and the company's macro-data.</p>
+      </section>
+
+      <hr class="my-8 border-border" />
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">2. Deep Professional Profiling & Intent Extraction (The Intelligence Agent)</h2>
+        <p class="text-foreground/80">Raw LinkedIn data is insufficient for a hyper-personalized ABM approach. I feed the JSON payloads from the first step into my first LLM node: The Corporate Intelligence Researcher. I use a massive, iterated system prompt designed to synthesize a verified profile by connecting datasets with targeted web research. I strictly instruct the agent to extract facts, source direct quotes, and clearly flag any conservative inferences.</p>
+        <p class="text-foreground/80"><strong>Key Extraction Vectors:</strong></p>
+        <ul class="list-disc pl-6 space-y-2">
+          <li><strong>Role Meaning & Decision Authority:</strong> I determine if the prospect has the P&L authority and buying committee influence  to actually purchase Elogia's services.</li>
+          <li><strong>Product Jurisdiction:</strong> I map exactly which specific FMCG brands and products fall under their purview.</li>
+          <li><strong>Intent Data & Recent Activity:</strong> I utilize the native Clay Agent built for web research to extract intent signals. I scrape the web for recent interviews, podcast appearances, product launches, or strategic priorities tied to their name.</li>
+        </ul>
+        <p class="text-foreground/80"><strong>Output:</strong> A master <code class="bg-muted px-1 py-0.5 rounded text-sm">Professional Profile</code> JSON object.</p>
+      </section>
+
+      <hr class="my-8 border-border" />
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">3. Pain Point Extraction (The Empathy Engine)</h2>
+        <p class="text-foreground/80">Once I know exactly who they are, I must define what keeps them up at night. I pass the Professional Profile JSON to the next LLM node: The B2B Pain Point Analyst. I deploy this agent to conduct specialized research to score the prospect's pain points across five categories: Organizational, Market, Operational, Performance, and Transformation.</p>
+        <p class="text-foreground/80"><strong>The Scoring Matrix:</strong></p>
+        <ul class="list-disc pl-6 space-y-2">
+          <li><strong>Evidence Level:</strong> I classify pain points from Direct (e.g., direct quotes from the prospect's latest podcast ) to Inferred (e.g., FMCG industry norms in Spain ).</li>
+          <li><strong>Impact & Urgency:</strong> I score how pressing the issue is and the potential revenue cost of leaving it unresolved.</li>
+        </ul>
+        <p class="text-foreground/80"><strong>Output:</strong> A targeted <code class="bg-muted px-1 py-0.5 rounded text-sm">Pain Points</code> JSON object, effectively generating a dynamic, hyper-accurate buyer persona  in seconds.</p>
+      </section>
+
+      <hr class="my-8 border-border" />
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">4. Value Mapping (The Strategic Bridge)</h2>
+        <p class="text-foreground/80">Before moving to the outreach sequence, my engine must dynamically align the prospect's verified pain points with Elogia's core offerings. I utilize a dynamic context table that outlines Elogia's Digital Shelf Content Optimization services. My Communication Strategist agent ingests the Pain Points JSON and the Elogia Context object to build a strategic messaging architecture.</p>
+        <p class="text-foreground/80"><strong>The Architecture:</strong></p>
+        <ul class="list-disc pl-6 space-y-2">
+          <li><strong>The Hook:</strong> I formulate an opening based on their most urgent pain point or a recent public statement.</li>
+          <li><strong>The Bridge:</strong> I connect their specific FMCG operational headache to Elogia's ability to improve clarity and increase conversion rates.</li>
+          <li><strong>Angle Variants:</strong> I generate distinct messaging angles prioritized by the severity of the prospect's pain points, ensuring the LLM has options when crafting the sequence.</li>
+        </ul>
+      </section>
+
+      <hr class="my-8 border-border" />
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">5. Digital Shelf Visual Audit (The Multimodal Analyst)</h2>
+        <p class="text-foreground/80">This is the ultimate contextual layer. Because Elogia helps brands stand out across e-retailers like Amazon, Carrefour, and El Corte Inglés through mobile-optimized imagery and A+ content, my outreach must be grounded in an actual visual audit of their products.</p>
+        <ol class="list-decimal pl-6 space-y-2">
+          <li><strong>Listing Scraping:</strong> Using the product jurisdictions identified in step 2, I trigger an API (such as Rainforest or a custom HTTP request) to pull the prospect's top-selling Amazon or El Corte Inglés listings, extracting the ASINs and high-resolution image URLs.</li>
+          <li><strong>Multimodal Critique:</strong> I feed these image URLs, alongside the product context, into a state-of-the-art multimodal model. I instruct the agent to act as a Senior Amazon Creative Director to evaluate what their current product imagery looks like.</li>
+          <li><strong>The Analysis:</strong> The AI assesses the main image for e-retailer compliance (pure white background, frame fill) and analyzes the gallery flow, mobile readiness, and the effectiveness of secondary infographic or lifestyle images.</li>
+        </ol>
+        <p class="text-foreground/80"><strong>Output:</strong> A <code class="bg-muted px-1 py-0.5 rounded text-sm">Visual Audit</code> JSON that contains prioritized recommendations and highlights specific visual flaws detected in their product sheet.</p>
+      </section>
+
+      <hr class="my-8 border-border" />
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">Conclusion: The Ultimate Payload</h2>
+        <p class="text-foreground/80">By the end of this Enrichment Strategy , I have successfully mapped the logic to move from a simple email address to having key data about that person and their company. I now possess a master dataset containing:</p>
+        <ol class="list-decimal pl-6 space-y-2">
+          <li>The prospect's exact organizational authority and buying committee status.</li>
+          <li>Their most urgent, verified pain points mapped via intent signals.</li>
+          <li>A strategic map connecting their headaches to Elogia's solutions.</li>
+          <li>A bespoke visual critique of their active e-retailer listings, checking if they have an Amazon store and analyzing their current imagery.</li>
+        </ol>
+        <p class="text-foreground/80">This modular, scalable workflow ensures that the subsequent drafting engine has the absolute maximum context required to generate consultative, human-sounding, 1-to-1 outreach sequences.</p>
+      </section>
+    </div>
+
+    <div class="mt-12 pt-8 border-t">
+      <div class="mb-8 flex items-center justify-center gap-3">
+        <h2 class="text-2xl font-bold sm:text-3xl">
+          Live Demo
+        </h2>
+        <InfoModal client:load />
+      </div>
+
+      <div class="mt-6">
+        <EnrichmentForm client:load />
+      </div>
+
+      <div class="mt-8">
+        <h3 class="text-xl font-semibold mb-4">Payload Status</h3>
+        <PayloadCardsGrid client:load />
+      </div>
+    </div>
+  </main>
+</Layout>

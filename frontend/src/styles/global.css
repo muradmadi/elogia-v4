@@ -1,0 +1,188 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
+
+/* ==============================================================================
+   1. THE TAILWIND BRIDGE
+   Maps Tailwind classes (like `bg-primary`) to our CSS variables below.
+   ============================================================================== */
+@theme inline {
+  --font-sans: "Inter Variable", sans-serif;
+  --font-heading: var(--font-sans);
+
+  /* Core structural colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Elevated containers (Panels, widgets, cards) */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  /* Floating elements (Dropdowns, tooltips, dialogs) */
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Main brand actions (Primary buttons like "Save" or "Submit") */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* Secondary actions (Cancel buttons, subtle badges) */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  /* Disabled states or subtle structural backgrounds */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(
+    --muted-foreground
+  ); /* Used for hints/timestamps */
+
+  /* Hover states for menus and list items */
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* Error states (Destructive actions like "Delete") */
+  --color-destructive: var(--destructive);
+
+  /* Lines, borders, and input rings */
+  --color-border: var(--border); /* Default dividers */
+  --color-input: var(--input); /* Input fields specifically */
+  --color-ring: var(--ring); /* The focus glow ring for accessibility */
+
+  /* Sidebar specific tokens */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Data visualization */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Custom Semantic Tokens */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-overlay: var(--overlay);
+
+  /* Border Radii */
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
+}
+
+/* ==============================================================================
+   2. THE STORAGE (PERMANENT DARK MODE)
+   Rule of thumb:
+   - Base token (e.g., `--primary`): The background color of the element.
+   - Foreground token (e.g., `--primary-foreground`): The text/icon color on top.
+   ============================================================================== */
+:root {
+  /* Main app background and text */
+  --background: oklch(0.14 0 0); /* Lifted from pitch black to charcoal */
+  --foreground: oklch(0.85 0 0); /* Dimmed from glaring white to soft ash */
+
+  /* Panels and cards */
+  --card: oklch(0.17 0 0);
+  --card-foreground: oklch(0.85 0 0);
+
+  /* Dropdowns and dialogs */
+  --popover: oklch(0.17 0 0);
+  --popover-foreground: oklch(0.85 0 0);
+
+  /* Primary brand buttons */
+  --primary: oklch(0.85 0 0);
+  --primary-foreground: oklch(0.14 0 0); /* Inverted for primary button text */
+
+  /* Secondary buttons */
+  --secondary: oklch(0.22 0 0);
+  --secondary-foreground: oklch(0.85 0 0);
+
+  /* Disabled elements and helper text */
+  --muted: oklch(0.2 0 0);
+  --muted-foreground: oklch(0.65 0 0); /* Raised slightly for legibility */
+
+  /* Hover states for menus */
+  --accent: oklch(0.22 0 0);
+  --accent-foreground: oklch(0.85 0 0);
+
+  /* Destructive actions (Errors/Deletes) */
+  --destructive: oklch(0.55 0.2 27); /* Slightly desaturated the harsh red */
+
+  /* Structural lines */
+  --border: oklch(0.25 0 0);
+  --input: oklch(0.25 0 0);
+  --ring: oklch(0.4 0 0); /* Calmed the focus ring so it doesn't scream */
+
+  /* Charts */
+  --chart-1: oklch(0.8 0 0);
+  --chart-2: oklch(0.65 0 0);
+  --chart-3: oklch(0.5 0 0);
+  --chart-4: oklch(0.35 0 0);
+  --chart-5: oklch(0.25 0 0);
+
+  /* Global border radius for shadcn components */
+  --radius: 0.3rem; /* Eased from 0rem for softer physical architecture */
+
+  /* Sidebar UI */
+  --sidebar: oklch(0.16 0 0);
+  --sidebar-foreground: oklch(0.85 0 0);
+  --sidebar-primary: oklch(0.85 0 0);
+  --sidebar-primary-foreground: oklch(0.14 0 0);
+  --sidebar-accent: oklch(0.2 0 0);
+  --sidebar-accent-foreground: oklch(0.85 0 0);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: oklch(0.4 0 0);
+
+  /* Custom semantic additions */
+  --success: oklch(0.55 0.15 145); /* Slightly desaturated the harsh green */
+  --success-foreground: oklch(0.14 0 0);
+  --overlay: oklch(0 0 0 / 0.5); /* Dialed back the backdrop dimming */
+}
+
+/* ==============================================================================
+   3. GLOBAL BASE STYLES
+   Applies the default background, text color, and border color to the whole app.
+   ============================================================================== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ==============================================================================
+   4. CUSTOM SCROLLBAR STYLES
+   ============================================================================== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}

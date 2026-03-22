@@ -1,0 +1,93 @@
+---
+import Layout from "../components/layout/Layout.astro";
+import { Navbar } from "../components/layout/Navbar";
+import { InfoModal } from "../components/features/InfoModal";
+import { SequenceLiveDemo } from "../components/features/SequenceLiveDemo";
+---
+
+<Layout title="Prompting">
+  <Navbar client:load />
+
+  <main class="mx-auto max-w-5xl px-6 py-12 space-y-8">
+    <h1 class="text-4xl font-bold tracking-tight">Prompt Architecture</h1>
+    <p class="mt-4 text-muted-foreground">The Message "Factory" – High‑cleanliness orchestration layer for 8‑touch email sequences</p>
+
+    <div class="space-y-8">
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">Prompt Architecture (The Message "Factory")</h2>
+        <p class="text-foreground/80">Building a sequencing engine requires strict control over the AI to ensure high architectural cleanliness and zero bloat. If we allow an LLM to freely generate text without rigid boundaries, it will inevitably hallucinate or revert to robotic, generic copy.</p>
+        <p class="text-foreground/80">To solve this, my orchestration layer connects the backend database directly to Claude Sonnet. Once I select a target from the database (which now holds the rich enrichment payload from Challenge 1), I trigger a payload transmission. Claude ingests this specific prospect data alongside a highly engineered Master System Prompt to orchestrate a sequence of 8 touches (emails).</p>
+        <p class="text-foreground/80">Here is how the prompt architecture and sequencing logic work under the hood.</p>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">The Orchestration Layer & Master Prompt</h2>
+        <p class="text-foreground/80">The core philosophy of this engine is that the AI does not just write emails; it acts as a strategic orchestrator. I designed the Master Prompt to enforce the right role, Elogia's tone of voice, and deep knowledge of what Digital Shelf Content is.</p>
+        <p class="text-foreground/80">By constraining Claude to output only valid JSON, I eliminate conversational bloat and allow the backend to seamlessly parse the output into our sending tools (like Smartlead or Instantly) without manual formatting.</p>
+        <p class="text-foreground/80">Here is the exact Master System Prompt deployed in the backend:</p>
+        <div class="bg-muted border border-border rounded-lg p-4 overflow-x-auto custom-scrollbar">
+          <pre class="text-sm font-mono whitespace-pre"><code>You are an elite B2B SDR and Growth Consultant at Elogia.
+
+**YOUR EXPERTISE & VALUE PROPOSITION:**
+You specialize in Digital Shelf Content Optimization. You help FMCG brands stand out, improve clarity, and massively increase conversion rates across e-retailers (Amazon, Carrefour, El Corte Inglés, etc.). You achieve this through mobile-optimized imagery, persuasive copy, and A+ content.
+
+**YOUR TARGET AUDIENCE:**
+Brand Managers at Fast-Moving Consumer Goods (FMCG) companies in Spain (Mid-market to Enterprise).
+
+**YOUR TONE:**
+Human, highly consultative, and persuasive. You write like a peer sharing a valuable observation, not a desperate salesperson. ABSOLUTELY NO generic automated templates (e.g., NEVER use "Hello [Name], I saw you work at [Company]").
+
+**YOUR INSTRUCTIONS:**
+Analyze the provided JSON enrichment payload (containing company intent, person profile, pain points, and product imagery analysis).
+First, perform a strategic analysis of the account.
+Second, design a hyper-personalized 8-touch email sequence. Do not write the full emails; provide the objective, the specific AI instruction to generate the email, and a realistic example snippet.
+
+**SEQUENCE PROGRESSION RULES:**
+- Touch 1: Observation/Relevance hook (e.g., mentioning a specific visual flaw detected in their product sheet on a specific retailer).
+- Touches 2-3: Value Delivery (Educational insights on mobile-first imagery or algorithm preferences).
+- Touches 4-5: Proof / Case Studies (Relevant FMCG examples demonstrating conversion lifts).
+- Touches 6-7: Consultative push (Audit offers, competitor benchmarks, or visual teardowns).
+- Touch 8: The Break-up (A polite, value-driven final attempt to engage).
+
+**OUTPUT REQUIREMENTS:**
+- OUTPUT ONLY VALID JSON.
+- DO NOT output markdown blocks (no ```json backticks).
+- DO NOT output conversational text outside the JSON.
+- Follow this exact structure:
+
+&#123;
+  "account_strategy_analysis": &#123;
+    "identified_core_pain_point": "Brief analysis of their main digital shelf gap based on context",
+    "personalization_angle": "How we will connect Elogia's value to this specific Brand Manager's goals"
+  &#125;,
+  "touches": [ ... ]
+&#125;
+</code></pre>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">The Sequence Map Logic</h2>
+        <p class="text-foreground/80">The Master Prompt forces Claude to generate a distinct objective of each one and the specific instruction (prompt)  for eight separate touchpoints. The sequence is explicitly designed to mimic a consultative peer rather than an automated bot, progressing logically over time.</p>
+        <ul class="list-disc pl-6 space-y-2">
+          <li><strong>Touch 1 (The Observation):</strong> Instead of a generic pitch, the instruction forces the AI to open by mentioning a specific visual flaw we detected in their product sheet on a retailer like Amazon or El Corte Inglés. This proves to the Brand Manager that we have done the work before asking for their time.</li>
+          <li><strong>Touches 2 & 3 (Value Delivery):</strong> The engine shifts to education. The AI prompt instructions for these touches focus on delivering highly specific "pills" of insight regarding mobile-first imagery and A+ Content gaps directly related to the prospect's product category.</li>
+          <li><strong>Touches 4 & 5 (Proof via Case Studies):</strong> The instructions command the AI to weave in relevant FMCG case studies, proving that Elogia's specific interventions lead directly to conversion lifts on e-retailer platforms.</li>
+          <li><strong>Touches 6 & 7 (Consultative Push):</strong> The AI generates instructions to offer a low-friction, high-value asset, such as a mini visual teardown or a competitor benchmark. This acts as a soft call-to-action based on the data extracted in Challenge 1.</li>
+          <li><strong>Touch 8 (The Break-up):</strong> The final instruction generates a polite, value-driven break-up follow-up. It removes the pressure, positioning the consultant as a helpful resource should the Brand Manager's priorities shift in the future.</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="mt-12 pt-8 border-t">
+      <div class="mb-8 flex items-center justify-center gap-3">
+        <h2 class="text-2xl font-bold sm:text-3xl">
+          Live Demo
+        </h2>
+        <InfoModal client:load />
+      </div>
+
+      <SequenceLiveDemo client:load />
+    </div>
+  </main>
+</Layout>
