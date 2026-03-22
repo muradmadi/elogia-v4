@@ -25,6 +25,8 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+.env.production
+.env.production.local
 
 # Log Files
 *.log
