@@ -46,11 +46,13 @@ WORKDIR /app
 # Copy application code
 COPY --chown=appuser:appuser ./app ./app
 COPY --chown=appuser:appuser ./migrations ./migrations
-COPY --chown=appuser:appuser ./storage ./storage
 COPY --chown=appuser:appuser ./requirements.txt .
 COPY --chown=appuser:appuser ./Makefile .
 COPY --chown=appuser:appuser ./.env.example .
 COPY --chown=appuser:appuser ./alembic.ini .
+
+# Create storage directory (will be mounted as volume in production)
+RUN mkdir -p /app/storage/pdfs
 
 # Environment variables
 ENV PYTHONPATH=/app
