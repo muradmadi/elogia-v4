@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: elogia-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: elogia_user
+      POSTGRES_PASSWORD: elogia_password
+      POSTGRES_DB: elogia_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U elogia_user -d elogia_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - elogia-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: elogia-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://elogia_user:elogia_password@postgres:5432/elogia_db
+      APP_ENV: production
+      APP_DEBUG: "false"
+      CORS_ORIGINS: "http://localhost:4321,http://frontend:80"
+      STORAGE_DIR: /app/storage/pdfs
+    volumes:
+      - backend_storage:/app/storage/pdfs
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/status"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - elogia-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_API_URL: http://backend:8000
+    container_name: elogia-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - elogia-network
+
+volumes:
+  postgres_data:
+    driver: local
+  backend_storage:
+    driver: local
+
+networks:
+  elogia-network:
+    driver: bridge

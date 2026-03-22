@@ -86,8 +86,8 @@ docs/_build/
 *.sqlite3
 
 # Alembic migration artifacts
-alembic.ini
-migrations/versions/*.py
+# alembic.ini and migrations are tracked (needed for Docker deployment)
+
 
 # Backend-specific
 .venv/
