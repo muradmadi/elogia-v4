@@ -1,6 +1,29 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:v3.3
+    container_name: elogia-traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=murad@muradmadi.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - elogia-network
+
   postgres:
     image: postgres:16-alpine
     container_name: elogia-postgres
@@ -11,8 +34,6 @@ services:
       POSTGRES_DB: elogia_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U elogia_user -d elogia_db"]
       interval: 10s
@@ -36,12 +57,10 @@ services:
       ALEMBIC_DB_URL: postgresql+asyncpg://elogia_user:elogia_password@postgres:5432/elogia_db
       APP_ENV: production
       APP_DEBUG: "true"
-      CORS_ORIGINS: '["http://localhost:4321","http://frontend:8080","https://elogia.muradmadi.com","https://api.muradmadi.com"]'
+      CORS_ORIGINS: '["http://localhost:4321","http://frontend:80","https://elogia.muradmadi.com","https://api.muradmadi.com"]'
       STORAGE_DIR: /app/storage/pdfs
     volumes:
       - backend_storage:/app/storage/pdfs
-    ports:
-      - "8000:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/status"]
       interval: 30s
@@ -52,6 +71,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`api.muradmadi.com`)"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      - "traefik.http.routers.backend.entrypoints=web,websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
     networks:
       - elogia-network
 
@@ -65,12 +86,12 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
-    ports:
-      - "8080:80"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`elogia.muradmadi.com`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.frontend.entrypoints=web,websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
     networks:
       - elogia-network
 
