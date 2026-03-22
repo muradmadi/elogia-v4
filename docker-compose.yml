@@ -48,6 +48,10 @@ services:
       timeout: 3s
       retries: 3
       start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.muradmadi.com`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
     networks:
       - elogia-network
 
@@ -63,6 +67,10 @@ services:
       - backend
     ports:
       - "8080:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`elogia.muradmadi.com`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
     networks:
       - elogia-network
 
