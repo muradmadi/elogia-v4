@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     app_port: int = 8000
     
     # Database settings
-    database_url: str = "postgresql+asyncpg://user:password@localhost:5432/elogia_db"
+    database_url: str = "postgresql+asyncpg://elogia_user:elogia_password@postgres:5432/elogia_db"
     
     # Security
     secret_key: str = "your-secret-key-here-change-in-production"
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     
     # Alembic
-    alembic_db_url: str = "postgresql+asyncpg://user:password@localhost:5432/elogia_db"
+    alembic_db_url: str = "postgresql+asyncpg://elogia_user:elogia_password@postgres:5432/elogia_db"
     
     # Clay Webhook Integration
     clay_webhook_url: str = "https://api.clay.com/v3/sources/webhook/pull-in-data-from-a-webhook-5ed7a29a-3a2c-4d01-ae22-f877fc4d5197"
