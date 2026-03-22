@@ -10,8 +10,12 @@ COPY package*.json ./
 # Clean install dependencies
 RUN npm ci
 
-# Copy entire frontend source code
-COPY . .
+# Copy entire source code including src/pages directory
+COPY src ./src
+COPY astro.config.mjs .
+COPY tsconfig.json .
+COPY components.json .
+COPY public ./public
 
 # Accept PUBLIC_API_URL as build argument
 # This allows Dokploy to inject the API URL at build time

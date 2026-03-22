@@ -1,29 +1,6 @@
 version: '3.8'
 
 services:
-  traefik:
-    image: traefik:v3.3
-    container_name: elogia-traefik
-    restart: unless-stopped
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=murad@muradmadi.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8081:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-    networks:
-      - elogia-network
-
   postgres:
     image: postgres:16-alpine
     container_name: elogia-postgres
@@ -41,7 +18,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - elogia-network
+      - elogia-internal
 
   backend:
     build:
@@ -74,7 +51,8 @@ services:
       - "traefik.http.routers.backend.entrypoints=web,websecure"
       - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
     networks:
-      - elogia-network
+      - elogia-internal
+      - dokploy-network
 
   frontend:
     build:
@@ -93,7 +71,8 @@ services:
       - "traefik.http.routers.frontend.entrypoints=web,websecure"
       - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
     networks:
-      - elogia-network
+      - elogia-internal
+      - dokploy-network
 
 volumes:
   postgres_data:
@@ -102,5 +81,8 @@ volumes:
     driver: local
 
 networks:
-  elogia-network:
+  elogia-internal:
     driver: bridge
+  dokploy-network:
+    external: true
+    name: dokploy-network
