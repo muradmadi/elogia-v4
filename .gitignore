@@ -63,3 +63,8 @@ dist/
 htmlcov/
 
 # IDE specific (already covered above)
+
+# Project-specific ignores
+backend/storage/
+docker-compose.yml.bak
+frontend/.astro/
