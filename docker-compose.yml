@@ -35,7 +35,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://elogia_user:elogia_password@postgres:5432/elogia_db
       APP_ENV: production
       APP_DEBUG: "false"
-      CORS_ORIGINS: "http://localhost:4321,http://frontend:80"
+      CORS_ORIGINS: '["http://localhost:4321","http://frontend:8080"]'
       STORAGE_DIR: /app/storage/pdfs
     volumes:
       - backend_storage:/app/storage/pdfs
