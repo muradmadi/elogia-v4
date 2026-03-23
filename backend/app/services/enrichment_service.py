@@ -438,10 +438,17 @@ class EnrichmentService:
         
         # Transform using product transformer
         from app.transformers.products import transform_product
-        product_data = transform_product(job.payload_4)
-        # Return as list to match frontend expectation
-        return [ProductSchema.model_validate(product_data)]
-
+        
+        payload_data = job.payload_4
+        if isinstance(payload_data, list):
+            products_list = []
+            for item in payload_data:
+                product_data = transform_product(item)
+                products_list.append(ProductSchema.model_validate(product_data))
+            return products_list
+        else:
+            product_data = transform_product(payload_data)
+            return [ProductSchema.model_validate(product_data)]
     async def get_painpoints_schema(
         self,
         job_id: str,

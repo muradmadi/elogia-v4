@@ -4,7 +4,7 @@ from .base import parse_date, slice_list
 
 def transform_person(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Extract person fields from payload 1."""
-    name = payload.get("name", "")
+    name = payload.get("name") or payload.get("full_name") or payload.get("fullName", "")
     # Simple name splitting (first word as first name, rest as last name)
     parts = name.split(" ", 1)
     first_name = parts[0] if parts else None
@@ -14,8 +14,8 @@ def transform_person(payload: Dict[str, Any]) -> Dict[str, Any]:
         "name": name,  # alias full_name
         "first_name": first_name,
         "last_name": last_name,
-        "linkedin_url": payload.get("url"),
-        "location": payload.get("location_name"),
+        "linkedin_url": payload.get("url") or payload.get("linkedin_url"),
+        "location": payload.get("location_name") or payload.get("location"),
         "headline": payload.get("headline"),
         "summary": payload.get("summary"),
         "experience": [

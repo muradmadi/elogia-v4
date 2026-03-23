@@ -32,7 +32,7 @@ def transform_company(payload: Dict[str, Any]) -> Dict[str, Any]:
         "employee_count": payload.get("employee_count"),
         "annual_revenue": payload.get("annual_revenue"),
         "locality": headquarters,  # map headquarters to locality
-        "country": None,  # country not available in payload
+        "country": payload.get("country"),
         "description": payload.get("description"),
         "specialties": payload.get("specialties", []),
         "derived_datapoints": derived_datapoints if derived_datapoints else None,
