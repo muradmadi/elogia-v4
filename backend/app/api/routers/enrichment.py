@@ -87,6 +87,7 @@ async def get_job_payload(
 @router.get(
     "/{job_id}/profile",
     response_model=ProfileSchema,
+    response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
     summary="Get transformed profile data for a job",
     description="Retrieve transformed profile data (payload 3 only) for frontend display.",
@@ -162,6 +163,7 @@ async def get_lead_profile_endpoint(
 @router.get(
     "/{job_id}/person",
     response_model=PersonSchema,
+    response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
     summary="Get transformed person data for a job",
     description="Retrieve transformed person data (payload 1) for frontend display.",
@@ -196,6 +198,7 @@ async def get_person_endpoint(
 @router.get(
     "/{job_id}/company",
     response_model=CompanySchema,
+    response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
     summary="Get transformed company data for a job",
     description="Retrieve transformed company data (payload 2) for frontend display.",
@@ -230,6 +233,7 @@ async def get_company_endpoint(
 @router.get(
     "/{job_id}/products",
     response_model=List[ProductSchema],
+    response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
     summary="Get transformed products data for a job",
     description="Retrieve transformed products data (payload 4) for frontend display.",
@@ -264,6 +268,7 @@ async def get_products_endpoint(
 @router.get(
     "/{job_id}/painpoints",
     response_model=PainPointsSchema,
+    response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
     summary="Get transformed pain points data for a job",
     description="Retrieve transformed pain points data (payload 5) for frontend display.",
@@ -298,6 +303,7 @@ async def get_painpoints_endpoint(
 @router.get(
     "/{job_id}/communication",
     response_model=CommunicationSchema,
+    response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
     summary="Get transformed communication data for a job",
     description="Retrieve transformed communication data (payload 6) for frontend display.",

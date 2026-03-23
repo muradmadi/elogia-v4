@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, Component, ErrorInfo, ReactNode } from "react";
 import { useStore } from "@nanostores/react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -95,6 +95,34 @@ function toTitleCase(str: string | null): string {
   return str.replace(/\w\S*/g, (txt) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
+}
+
+class PayloadErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean, errorInfo: string }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, errorInfo: "" };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, errorInfo: error.message };
+  }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("PayloadErrorBoundary caught error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-6">
+          <Alert variant="destructive">
+            <AlertTitle>React Crash Prevented</AlertTitle>
+            <AlertDescription>
+              The UI attempted to crash, but it was caught. Error: {this.state.errorInfo}
+            </AlertDescription>
+          </Alert>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 export function PayloadDetailModal() {
@@ -199,6 +227,7 @@ export function PayloadDetailModal() {
         </CardHeader>
 
         <CardContent className="flex-1 overflow-hidden p-0">
+          <PayloadErrorBoundary>
           {isLoading ? (
             <div className="p-6 space-y-4">
               <Skeleton className="h-6 w-3/4" />
@@ -233,6 +262,7 @@ export function PayloadDetailModal() {
               })()}
             </div>
           )}
+          </PayloadErrorBoundary>
         </CardContent>
       </Card>
     </div>
