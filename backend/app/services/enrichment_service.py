@@ -1,5 +1,5 @@
 """Service layer for handling enrichment webhook processing."""
-from typing import Optional, List
+from typing import Optional, List, Dict
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
@@ -10,7 +10,11 @@ from app.core.status import EnrichmentJobStatus
 from app.models.enrichment import EnrichmentJob
 from app.schemas.enrichment import JobSummary, ConsolidatedPayload
 from app.schemas.webhook import ClayWebhookPayload
-from app.schemas.enriched_data import LeadProfileView
+from app.schemas.enriched_data import (
+    PersonSchema, CompanySchema, ProfileSchema,
+    ProductSchema, PainPointsSchema, CommunicationSchema
+)
+from app.schemas.lead_profile import LeadProfileView
 from app.transformers import build_lead_profile
 
 
@@ -256,5 +260,420 @@ class EnrichmentService:
         
         # Transform raw payloads into structured LeadProfileView
         return await self.build_profile_from_job(job)
+
+    async def get_person_schema(
+        self,
+        job_id: str,
+    ) -> PersonSchema:
+        """Get transformed person data (payload 1).
+        
+        Args:
+            job_id: The job identifier (UUID string).
+        
+        Returns:
+            PersonSchema: Transformed person data.
+        
+        Raises:
+            HTTPException: If job is not found or payload is missing.
+        """
+        try:
+            uuid_job_id = UUID(job_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid job ID format: {job_id}",
+            )
+        
+        result = await self.db.execute(
+            select(EnrichmentJob).where(EnrichmentJob.job_id == uuid_job_id)
+        )
+        job = result.scalar_one_or_none()
+        
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Enrichment job with ID {job_id} not found",
+            )
+        
+        if not job.payload_1:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Person payload not yet available for job {job_id}",
+            )
+        
+        # Transform using person transformer
+        from app.transformers.person import transform_person
+        person_data = transform_person(job.payload_1)
+        return PersonSchema.model_validate(person_data)
+
+    async def get_company_schema(
+        self,
+        job_id: str,
+    ) -> CompanySchema:
+        """Get transformed company data (payload 2).
+        
+        Args:
+            job_id: The job identifier (UUID string).
+        
+        Returns:
+            CompanySchema: Transformed company data.
+        
+        Raises:
+            HTTPException: If job is not found or payload is missing.
+        """
+        try:
+            uuid_job_id = UUID(job_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid job ID format: {job_id}",
+            )
+        
+        result = await self.db.execute(
+            select(EnrichmentJob).where(EnrichmentJob.job_id == uuid_job_id)
+        )
+        job = result.scalar_one_or_none()
+        
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Enrichment job with ID {job_id} not found",
+            )
+        
+        if not job.payload_2:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Company payload not yet available for job {job_id}",
+            )
+        
+        # Transform using company transformer
+        from app.transformers.company import transform_company
+        company_data = transform_company(job.payload_2)
+        return CompanySchema.model_validate(company_data)
+
+    async def get_profile_schema(
+        self,
+        job_id: str,
+    ) -> ProfileSchema:
+        """Get transformed profile data (payload 3 only).
+        
+        Args:
+            job_id: The job identifier (UUID string).
+        
+        Returns:
+            ProfileSchema: Transformed profile data.
+        
+        Raises:
+            HTTPException: If job is not found or payload is missing.
+        """
+        try:
+            uuid_job_id = UUID(job_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid job ID format: {job_id}",
+            )
+        
+        result = await self.db.execute(
+            select(EnrichmentJob).where(EnrichmentJob.job_id == uuid_job_id)
+        )
+        job = result.scalar_one_or_none()
+        
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Enrichment job with ID {job_id} not found",
+            )
+        
+        if not job.payload_3:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Profile payload not yet available for job {job_id}",
+            )
+        
+        # Transform using profile transformer
+        from app.transformers.profile import transform_profile
+        profile_data = transform_profile(job.payload_3)
+        return ProfileSchema.model_validate(profile_data)
+
+    async def get_products_schema(
+        self,
+        job_id: str,
+    ) -> List[ProductSchema]:
+        """Get transformed products data (payload 4).
+        
+        Args:
+            job_id: The job identifier (UUID string).
+        
+        Returns:
+            List[ProductSchema]: List of transformed product data.
+        
+        Raises:
+            HTTPException: If job is not found or payload is missing.
+        """
+        try:
+            uuid_job_id = UUID(job_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid job ID format: {job_id}",
+            )
+        
+        result = await self.db.execute(
+            select(EnrichmentJob).where(EnrichmentJob.job_id == uuid_job_id)
+        )
+        job = result.scalar_one_or_none()
+        
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Enrichment job with ID {job_id} not found",
+            )
+        
+        if not job.payload_4:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Products payload not yet available for job {job_id}",
+            )
+        
+        # Transform using product transformer
+        from app.transformers.products import transform_product
+        product_data = transform_product(job.payload_4)
+        # Return as list to match frontend expectation
+        return [ProductSchema.model_validate(product_data)]
+
+    async def get_painpoints_schema(
+        self,
+        job_id: str,
+    ) -> PainPointsSchema:
+        """Get transformed pain points data (payload 5).
+        
+        Args:
+            job_id: The job identifier (UUID string).
+        
+        Returns:
+            PainPointsSchema: Transformed pain points data.
+        
+        Raises:
+            HTTPException: If job is not found or payload is missing.
+        """
+        try:
+            uuid_job_id = UUID(job_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid job ID format: {job_id}",
+            )
+        
+        result = await self.db.execute(
+            select(EnrichmentJob).where(EnrichmentJob.job_id == uuid_job_id)
+        )
+        job = result.scalar_one_or_none()
+        
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Enrichment job with ID {job_id} not found",
+            )
+        
+        if not job.payload_5:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Pain points payload not yet available for job {job_id}",
+            )
+        
+        # Transform using pain points transformer
+        from app.transformers.intelligence import transform_pain_points
+        pain_data = transform_pain_points(job.payload_5)
+        if not pain_data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Pain points transformation failed for job {job_id}",
+            )
+        
+        # Convert to PainPointsSchema format
+        from app.schemas.enriched_data import PainPointsSchema, TopPainsSummaryView, PainPointDetailView
+        from typing import Dict
+        
+        # Convert categories from list to dict
+        categories_dict: Dict[str, List[PainPointDetailView]] = {}
+        for category in pain_data.get("categories", []):
+            category_name = category.get("name", "uncategorized")
+            pain_points = []
+            for pain in category.get("pain_points", []):
+                pain_points.append(PainPointDetailView(
+                    pain_point=pain.get("pain_point", ""),
+                    description=pain.get("description", ""),
+                    urgency=pain.get("urgency", ""),
+                    frequency=pain.get("frequency", ""),
+                    impact=pain.get("impact", ""),
+                    evidence=pain.get("evidence", ""),
+                    evidence_level=pain.get("evidence_level", "")
+                ))
+            categories_dict[category_name] = pain_points
+        
+        # Create top pains summary
+        top_pains_data = pain_data.get("top_pains", {})
+        top_pains = TopPainsSummaryView(
+            most_urgent=top_pains_data.get("most_urgent", ""),
+            most_frequent=top_pains_data.get("most_frequent", ""),
+            most_impactful=top_pains_data.get("most_impactful", "")
+        )
+        
+        return PainPointsSchema(
+            notes=pain_data.get("notes"),
+            role_scope=pain_data.get("subject_title"),
+            top_pains=top_pains,
+            categories=categories_dict
+        )
+
+    async def get_communication_schema(
+        self,
+        job_id: str,
+    ) -> CommunicationSchema:
+        """Get transformed communication data (payload 6).
+        
+        Args:
+            job_id: The job identifier (UUID string).
+        
+        Returns:
+            CommunicationSchema: Transformed communication data.
+        
+        Raises:
+            HTTPException: If job is not found or payload is missing.
+        """
+        try:
+            uuid_job_id = UUID(job_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid job ID format: {job_id}",
+            )
+        
+        result = await self.db.execute(
+            select(EnrichmentJob).where(EnrichmentJob.job_id == uuid_job_id)
+        )
+        job = result.scalar_one_or_none()
+        
+        if not job:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Enrichment job with ID {job_id} not found",
+            )
+        
+        if not job.payload_6:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Communication payload not yet available for job {job_id}",
+            )
+        
+        # Transform using outreach strategy transformer
+        from app.transformers.intelligence import transform_outreach_strategy
+        outreach_data = transform_outreach_strategy(job.payload_6)
+        if not outreach_data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Communication transformation failed for job {job_id}",
+            )
+        
+        # Convert to CommunicationSchema format
+        from app.schemas.enriched_data import (
+            CommunicationSchema, StrategicPositioningView, MessageArchitectureView,
+            ChannelStrategyView, ChannelFormatView, ChannelTimingView,
+            AngleVariantView, RiskMitigationView, PainSolutionMapView,
+            ArchitectureElementView
+        )
+        
+        # Convert message architecture
+        message_arch_data = outreach_data.get("message_architecture", {})
+        message_architecture = MessageArchitectureView(
+            hook=ArchitectureElementView(
+                text=message_arch_data.get("hook", ""),
+                source=None,
+                rationale=None
+            ),
+            bridge=ArchitectureElementView(
+                text=message_arch_data.get("bridge", ""),
+                source=None,
+                rationale=None
+            ),
+            proof=ArchitectureElementView(
+                text=message_arch_data.get("proof", ""),
+                source=None,
+                rationale=None
+            ),
+            ask=ArchitectureElementView(
+                text=message_arch_data.get("ask", ""),
+                source=None,
+                rationale=None
+            )
+        )
+        
+        # Convert channel strategy
+        channel_strat_data = outreach_data.get("channel_strategy", {})
+        timing_data = channel_strat_data.get("timing", {})
+        format_data = channel_strat_data.get("format", {})
+        
+        channel_strategy = ChannelStrategyView(
+            primary_channel=channel_strat_data.get("primary_channel", ""),
+            secondary_channel=channel_strat_data.get("secondary_channel", ""),
+            format=ChannelFormatView(
+                style=format_data.get("style", ""),
+                length=format_data.get("length", ""),
+                reasoning=format_data.get("reasoning")
+            ),
+            timing=ChannelTimingView(
+                best_time=timing_data.get("best_time", ""),
+                avoid_time=timing_data.get("avoid_time", ""),
+                reasoning=timing_data.get("reasoning")
+            )
+        )
+        
+        # Convert angle variants
+        angle_variants = []
+        for angle in outreach_data.get("angle_variants", []):
+            angle_variants.append(AngleVariantView(
+                angle_name=angle.get("angle_name", ""),
+                target_pain=angle.get("target_pain", ""),
+                opening=angle.get("opening", ""),
+                framing=angle.get("framing", ""),
+                proof_point=angle.get("proof_point", ""),
+                cta=angle.get("cta", "")
+            ))
+        
+        # Convert risk mitigation
+        risk_mitigation = []
+        for risk in outreach_data.get("risk_mitigation", []):
+            risk_mitigation.append(RiskMitigationView(
+                risk=risk.get("risk", ""),
+                impact=risk.get("impact", ""),
+                likelihood=risk.get("likelihood", ""),
+                mitigation=risk.get("mitigation", "")
+            ))
+        
+        # Convert strategic positioning
+        strategic_pos_data = outreach_data.get("strategic_positioning", {})
+        pain_solution_map = []
+        for map_item in strategic_pos_data.get("pain_solution_map", []):
+            pain_solution_map.append(PainSolutionMapView(
+                their_pain=map_item.get("their_pain", ""),
+                your_solution=map_item.get("your_solution", ""),
+                evidence_level=map_item.get("evidence_level", ""),
+                connection_logic=map_item.get("connection_logic", "")
+            ))
+        
+        strategic_positioning = StrategicPositioningView(
+            core_thesis=strategic_pos_data.get("core_thesis", ""),
+            pain_solution_map=pain_solution_map
+        )
+        
+        return CommunicationSchema(
+            notes=outreach_data.get("notes"),
+            strategic_positioning=strategic_positioning,
+            message_architecture=message_architecture,
+            channel_strategy=channel_strategy,
+            angle_variants=angle_variants,
+            risk_mitigation=risk_mitigation
+        )
 
 

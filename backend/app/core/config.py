@@ -1,6 +1,7 @@
 """Application configuration using Pydantic BaseSettings."""
 from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 
 
 class Settings(BaseSettings):
@@ -41,6 +42,16 @@ class Settings(BaseSettings):
     
     # AI API Keys
     anthropic_api_key: str = ""
+    
+    @field_validator('cors_origins', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            if v.strip() == '':
+                return []
+            # Split by commas, strip whitespace
+            return [item.strip() for item in v.split(',') if item.strip()]
+        return v
     
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -29,7 +29,7 @@ Usage Pattern:
 
 from typing import Dict, Any, Optional
 
-from app.schemas.enriched_data import LeadProfileView
+from app.schemas.lead_profile import LeadProfileView
 from .person import transform_person
 from .company import transform_company
 from .intelligence import transform_role_intelligence

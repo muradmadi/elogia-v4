@@ -14,20 +14,26 @@ def transform_company(payload: Dict[str, Any]) -> Dict[str, Any]:
         headquarters = payload.get("locality", "")
 
     derived = payload.get("derived_datapoints", {})
-    tags = []
-    tags.extend(derived.get("business_type", []))
-    tags.extend(derived.get("subindustry", []))
-    if derived.get("pattern_tags"):
-        tags.append(derived["pattern_tags"])
+    # Build derived_datapoints object matching DerivedDatapointsView schema
+    derived_datapoints = {
+        "pattern_tags": derived.get("pattern_tags"),
+        "business_type": derived.get("business_type", []),
+        "business_stage": derived.get("business_stage"),
+        "scale_scope": derived.get("scale_scope"),
+    }
+    # Remove None values for optional fields
+    derived_datapoints = {k: v for k, v in derived_datapoints.items() if v is not None}
 
     return {
         "name": payload.get("name"),
         "domain": payload.get("domain"),
         "industry": payload.get("industry"),
         "size": payload.get("size"),
-        "revenue": payload.get("annual_revenue"),
-        "headquarters": headquarters,
+        "employee_count": payload.get("employee_count"),
+        "annual_revenue": payload.get("annual_revenue"),
+        "locality": headquarters,  # map headquarters to locality
+        "country": None,  # country not available in payload
         "description": payload.get("description"),
         "specialties": payload.get("specialties", []),
-        "business_tags": tags,
+        "derived_datapoints": derived_datapoints if derived_datapoints else None,
     }
