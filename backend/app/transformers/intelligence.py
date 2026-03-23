@@ -1,7 +1,6 @@
 import logging
 import re
 from typing import Dict, Any, List, Optional
-from .base import slice_list
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -38,7 +37,7 @@ def transform_product_intelligence(product_payload: Dict[str, Any]) -> List[Dict
         else:
             logger.warning(f"Could not extract product name from reasoning: {reasoning[:100]}...")
     else:
-        logger.warning(f"No reasoning field found or 'for' not in reasoning")
+        logger.warning("No reasoning field found or 'for' not in reasoning")
     
     # Fallback to generic name if extraction fails
     if not product_name:
@@ -267,45 +266,4 @@ def transform_outreach_strategy(outreach: Dict[str, Any]) -> Optional[Dict[str, 
         "risk_mitigation": outreach.get("riskMitigation", []),
         "strategic_positioning": strategic_positioning,
     }
-
-def transform_role_intelligence(
-    role_payload: Dict[str, Any],          # payload 3
-    product_payload: Dict[str, Any],       # payload 4 (single dict)
-    pain_payload: Dict[str, Any],           # payload 5
-    outreach_payload: Dict[str, Any],       # payload 6
-) -> Dict[str, Any]:
-    """Combine all intelligence sources into a RoleIntelligenceView shape."""
-    # From payload 3
-    day_to_day = role_payload.get("dayToDay", {}).get("highLevel", [])
-    decision_authority = role_payload.get("decisionAuthority", {}).get("summary", "")
-    # reports_to and direct_reports may come from roleMeaningAtCompany in payload 3
-    role_meaning = role_payload.get("roleMeaningAtCompany", {})
-    reports_to = role_meaning.get("likelyReportsTo", "")
-    direct_reports = role_meaning.get("directReports", "")
-    # department products - extract from product payload if available
-    department_products = []
-    # public statements from payload 3
-    public_statements = transform_public_statements(
-        role_payload.get("recentActivity", {}).get("publicStatements", [])
-    )
-    career_trajectory = role_payload.get("careerTrajectory", {}).get("pattern")
-    recent_initiatives = role_payload.get("recentActivity", {}).get("initiatives", [])
-
-    # Transform the other payloads
-    product_intelligence = transform_product_intelligence(product_payload)
-    pain_points = transform_pain_points(pain_payload)
-    outreach_strategy = transform_outreach_strategy(outreach_payload)
-
-    return {
-        "day_to_day": day_to_day,
-        "decision_authority": decision_authority,
-        "reports_to": reports_to,
-        "direct_reports": direct_reports,
-        "department_products": department_products,
-        "public_statements": public_statements,
-        "career_trajectory": career_trajectory,
-        "recent_initiatives": recent_initiatives,
-        "product_intelligence": product_intelligence,
-        "pain_points": pain_points,
-        "outreach_strategy": outreach_strategy,
-    }
+
