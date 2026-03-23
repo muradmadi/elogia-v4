@@ -195,14 +195,22 @@ export function EnrichmentForm({}: EnrichmentFormProps) {
     };
   }, []);
 
-  // Safety check: if isJobInProgress is true but no polling interval is active,
-  // reset the job state (e.g., after page refresh during a job)
-  // CRITICAL FIX: This effect is REMOVED because it creates race conditions
-  // Instead, we rely on:
-  // 1. pollForPayloads callback to properly set isJobInProgress=false
-  // 2. The recovery logic inside pollForPayloads to handle backend errors
-  // 3. Component unmounting to cleanup intervals
-  
+  // Restart polling if page loads with an in-progress job
+  useEffect(() => {
+    if (currentJobId && isJobInProgress && !pollingIntervalRef.current) {
+      console.log(`[enrichment] Restarting polling for existing job ${currentJobId}`);
+      jobStartTimeRef.current = Date.now();
+      
+      // Start polling immediately
+      pollForPayloads(currentJobId);
+      
+      // Then set up interval
+      pollingIntervalRef.current = setInterval(() => {
+        pollForPayloads(currentJobId);
+      }, 2000);
+    }
+  }, [currentJobId, isJobInProgress, pollForPayloads]);
+
   // Cleanup recovery timeout on unmount or when job completes
   useEffect(() => {
     return () => {
