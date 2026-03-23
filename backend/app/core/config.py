@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     n8n_shredder_webhook_url: str = "http://localhost:5678/webhook/content-shredder"
     
     # Public Base URL (used for callback URLs in both Clay and n8n webhooks)
-    public_base_url: str = "http://localhost:8000"
+    public_base_url: str = "https://api.muradmadi.com"
     
     # Storage directory for uploaded PDFs
     storage_dir: str = "storage/pdfs"
