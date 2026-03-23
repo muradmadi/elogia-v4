@@ -1,5 +1,5 @@
 """Pydantic schemas for Clay webhook payloads."""
-from typing import Literal
+from typing import Literal, Union, List, Dict, Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -36,7 +36,7 @@ class ClayWebhookPayload(BaseModel):
         description="Type of payload being sent by Clay",
     )
     
-    data: dict = Field(
+    data: Union[Dict[str, Any], List[Any]] = Field(
         ...,
         description="Dynamic payload data from Clay",
     )

@@ -1,4 +1,5 @@
-import React, { useEffect, useState, Component, ErrorInfo, ReactNode } from "react";
+import React, { useEffect, useState, Component } from "react";
+import type { ErrorInfo, ReactNode } from "react";
 import { useStore } from "@nanostores/react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -150,6 +151,7 @@ export function PayloadDetailModal() {
     if (!isOpen || !jobId || !payloadType) return;
 
     const fetchPayload = async () => {
+      setPayloadData(null); // Clear stale data instantly
       setIsLoading(true);
       setError(null);
 
