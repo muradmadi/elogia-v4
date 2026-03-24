@@ -44,11 +44,11 @@ class EnrichmentService:
         Raises:
             HTTPException: If job is not found or update fails.
         """
-        # Query the enrichment job by job_id
+        # Query the enrichment job by job_id with row-level locking to prevent race conditions
         result = await self.db.execute(
             select(EnrichmentJob).where(
                 EnrichmentJob.job_id == payload.job_id
-            )
+            ).with_for_update()
         )
         job = result.scalar_one_or_none()
         
