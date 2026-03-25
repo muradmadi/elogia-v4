@@ -94,29 +94,22 @@ class LLMService:
             )
     
     def _clean_response_text(self, text: str) -> str:
-        """Clean up LLM response text by removing markdown formatting.
+        """Clean up LLM response text by removing markdown formatting and extracting JSON.
         
         Args:
             text: The raw response text from Claude.
         
         Returns:
-            str: The cleaned text with markdown formatting removed.
+            str: The extracted JSON string.
         """
-        # Remove ```json at the start
-        if text.startswith("```json"):
-            text = text[7:].strip()
+        import re
         
-        # Remove ``` at the end
-        if text.endswith("```"):
-            text = text[:-3].strip()
-        
-        # Remove any remaining markdown code blocks
-        if text.startswith("```"):
-            text = text[3:].strip()
-        
-        if text.endswith("```"):
-            text = text[:-3].strip()
-        
+        # Try to extract a JSON object or array structure
+        json_match = re.search(r'(\{.*\}|\[.*\])', text, re.DOTALL)
+        if json_match:
+            return json_match.group(0).strip()
+            
+        # Fallback to just stripping whitespace if no clear JSON block is found
         return text.strip()
 
 

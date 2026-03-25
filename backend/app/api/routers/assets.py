@@ -57,6 +57,7 @@ async def upload_asset(
         asset, response = await service.upload_asset(
             file=file,
             public_base_url=settings.public_base_url,
+            background_tasks=background_tasks,
         )
         
         return response

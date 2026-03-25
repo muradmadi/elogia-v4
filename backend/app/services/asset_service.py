@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Tuple
 from uuid import UUID, uuid4
 
-from fastapi import HTTPException, status, UploadFile
+from fastapi import HTTPException, status, UploadFile, BackgroundTasks
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -43,6 +43,7 @@ class AssetService:
         self,
         file: UploadFile,
         public_base_url: str,
+        background_tasks: BackgroundTasks,
     ) -> Tuple[MarketingAsset, AssetUploadResponse]:
         """Upload a PDF asset and create a MarketingAsset record.
         
@@ -118,10 +119,11 @@ class AssetService:
             # Build full URL for n8n webhook using public_base_url
             full_file_url = f"{public_base_url}{storage_url}"
             
-            # Trigger n8n content shredder webhook
-            # Note: This should be called as a background task by the caller
+            # Trigger n8n content shredder webhook as a background task
+            # This completely drops the 30-second wait from the user's upload response
             n8n_service = N8nService()
-            await n8n_service.trigger_content_shredder(
+            background_tasks.add_task(
+                n8n_service.trigger_content_shredder,
                 asset_id=asset_id,
                 file_url=full_file_url,
             )
