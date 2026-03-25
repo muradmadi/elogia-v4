@@ -52,6 +52,8 @@ class N8nService:
         }
         
         try:
+            logger.info(f"Attempting to trigger n8n webhook at: {self.n8n_webhook_url} for asset {asset_id}")
+            
             # Fire-and-forget: don't wait for response
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
@@ -82,7 +84,7 @@ class N8nService:
             }
         except httpx.RequestError as e:
             # Network or timeout errors
-            logger.error(f"Network error triggering n8n webhook for asset {asset_id}: {str(e)}")
+            logger.error(f"Network error triggering n8n webhook for asset {asset_id} at URL {self.n8n_webhook_url}: {str(e)}")
             return {
                 "status": "webhook_failed",
                 "asset_id": str(asset_id),
