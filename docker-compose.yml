@@ -34,6 +34,12 @@ services:
       APP_DEBUG: "true"
       CORS_ORIGINS: '["http://localhost:4321","http://frontend:80","https://elogia.muradmadi.com","https://api.muradmadi.com"]'
       STORAGE_DIR: /app/storage/pdfs
+      # Pass-through variables from Dokploy UI
+      N8N_SHREDDER_WEBHOOK_URL: ${N8N_SHREDDER_WEBHOOK_URL}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+      CLAY_WEBHOOK_URL: ${CLAY_WEBHOOK_URL}
+      CLAY_WEBHOOK_AUTH_TOKEN: ${CLAY_WEBHOOK_AUTH_TOKEN}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     volumes:
       - backend_storage:/app/storage/pdfs
     healthcheck:
