@@ -3,7 +3,11 @@ import httpx
 from typing import Dict, Any
 from uuid import UUID
 
+import logging
+
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class N8nService:
@@ -50,13 +54,16 @@ class N8nService:
         try:
             # Fire-and-forget: don't wait for response
             async with httpx.AsyncClient(timeout=30.0) as client:
-                # Use a task to send the request without blocking
-                # We don't await the response - just fire it off
-                await client.post(
+                response = await client.post(
                     self.n8n_webhook_url,
                     json=payload,
                     headers=headers,
                 )
+                
+                # Check for HTTP errors like 404 Not Found
+                response.raise_for_status()
+            
+            logger.info(f"Triggered n8n shredder successfully for asset {asset_id}")
             
             # If we get here, the request was sent successfully
             return {
@@ -65,9 +72,17 @@ class N8nService:
                 "message": "n8n content shredder webhook triggered successfully",
             }
             
+        except httpx.HTTPStatusError as e:
+            logger.error(f"n8n webhook returned error status {e.response.status_code} for asset {asset_id}: {e.response.text}")
+            return {
+                "status": "webhook_failed",
+                "asset_id": str(asset_id),
+                "error": f"Webhook returned HTTP {e.response.status_code}",
+                "message": "Webhook trigger failed but asset was saved",
+            }
         except httpx.RequestError as e:
-            # Network or timeout errors - log but don't crash
-            # In production, you'd want to log this properly
+            # Network or timeout errors
+            logger.error(f"Network error triggering n8n webhook for asset {asset_id}: {str(e)}")
             return {
                 "status": "webhook_failed",
                 "asset_id": str(asset_id),
@@ -75,7 +90,8 @@ class N8nService:
                 "message": "Webhook trigger failed but asset was saved",
             }
         except Exception as e:
-            # Unexpected errors - log but don't crash
+            # Unexpected errors
+            logger.error(f"Unexpected error triggering n8n webhook for asset {asset_id}: {str(e)}", exc_info=True)
             return {
                 "status": "webhook_failed",
                 "asset_id": str(asset_id),
